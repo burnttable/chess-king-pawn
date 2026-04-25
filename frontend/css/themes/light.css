@@ -1,0 +1,45 @@
+:root {
+    /* Background Colors */
+    --background-color: #f5f5f5;
+    --header-bg: #ffffff;
+    --card-bg: #ffffff;
+    --input-bg: #ffffff;
+    --modal-bg: #ffffff;
+
+    /* Text Colors */
+    --text-color: #333333;
+    --text-secondary: #666666;
+
+    /* Border Colors */
+    --border-color: #dddddd;
+    --board-border: #8b4513;
+
+    /* Chess Board Colors */
+    --square-light: #f0d9b5;
+    --square-dark: #b58863;
+    --square-selected: #829769;
+    --square-capture: #ff6b6b;
+    --square-check: #ff4444;
+    --square-last-move: #cdd26a;
+
+    /* Valid Move Indicator */
+    --valid-move-indicator: rgba(0, 0, 0, 0.2);
+
+    /* Buttons */
+    --btn-primary: #4CAF50;
+    --btn-primary-hover: #45a049;
+    --btn-secondary: #f0f0f0;
+    --btn-secondary-hover: #e0e0e0;
+    --btn-danger: #f44336;
+    --btn-danger-hover: #da190b;
+
+    /* Timer */
+    --timer-bg: #fff3cd;
+
+    /* Messages */
+    --message-bg: #4CAF50;
+    --message-text: #ffffff;
+
+    /* Modal */
+    --modal-overlay: rgba(0, 0, 0, 0.5);
+}

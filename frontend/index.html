@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess - King & Pawn Variant</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link id="theme-link" rel="stylesheet" href="css/themes/light.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen">
+            <div class="login-container">
+                <h1>♔ Chess - King & Pawn ♚</h1>
+                <p class="subtitle">A simplified chess variant with only kings and pawns</p>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required
+                               minlength="3" maxlength="20" placeholder="Enter your username">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Start Playing</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen hidden">
+            <header class="game-header">
+                <div class="header-left">
+                    <h1>♔ Chess - King & Pawn ♚</h1>
+                    <span id="user-display" class="user-display"></span>
+                </div>
+                <div class="header-right">
+                    <button id="new-game-btn" class="btn btn-secondary">New Game</button>
+                    <button id="settings-btn" class="btn btn-secondary">⚙️ Settings</button>
+                    <button id="logout-btn" class="btn btn-secondary">Logout</button>
+                </div>
+            </header>
+
+            <main class="game-main">
+                <div class="game-info">
+                    <div class="info-card">
+                        <h3>Game Info</h3>
+                        <p>Difficulty: <span id="difficulty-display">-</span></p>
+                        <p>Status: <span id="game-status">-</span></p>
+                        <p>Turn: <span id="turn-display">-</span></p>
+                        <div id="timer-container" class="timer-container hidden">
+                            <p>Time: <span id="timer-display">10:00</span></p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <h3>Move History</h3>
+                        <div id="move-history" class="move-history"></div>
+                    </div>
+                </div>
+
+                <div class="chess-board-container">
+                    <div id="chess-board" class="chess-board"></div>
+                    <div id="game-message" class="game-message hidden"></div>
+                </div>
+
+                <div class="game-controls">
+                    <button id="undo-btn" class="btn btn-secondary" disabled>Undo Move</button>
+                    <button id="resign-btn" class="btn btn-danger">Resign</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button id="close-settings" class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="settings-form">
+                        <div class="form-group">
+                            <label for="theme-select">Theme</label>
+                            <select id="theme-select" name="theme">
+                                <option value="light">Light</option>
+                                <option value="dark">Dark</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="difficulty-select">Default Difficulty</label>
+                            <select id="difficulty-select" name="difficulty">
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="timer-enabled" name="timer_enabled">
+                                Enable Timer
+                            </label>
+                        </div>
+
+                        <div class="form-group hidden" id="timer-duration-group">
+                            <label for="timer-duration">Timer Duration (minutes)</label>
+                            <input type="number" id="timer-duration" name="timer_duration"
+                                   min="1" max="60" value="10">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save Settings</button>
+                            <button type="button" id="cancel-settings" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Game Modal -->
+        <div id="new-game-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Start New Game</h2>
+                    <button id="close-new-game" class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="new-game-form">
+                        <div class="form-group">
+                            <label for="game-difficulty">Difficulty</label>
+                            <select id="game-difficulty" name="difficulty">
+                                <option value="easy">Easy</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="game-timer-enabled" name="timer_enabled">
+                                Enable Timer
+                            </label>
+                        </div>
+
+                        <div class="form-group hidden" id="game-timer-duration-group">
+                            <label for="game-timer-duration">Timer Duration (minutes)</label>
+                            <input type="number" id="game-timer-duration" name="timer_duration"
+                                   min="1" max="60" value="10">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Start Game</button>
+                            <button type="button" id="cancel-new-game" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="game-over-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="game-over-title">Game Over</h2>
+                </div>
+                <div class="modal-body">
+                    <p id="game-over-message"></p>
+                    <div class="form-actions">
+                        <button id="play-again-btn" class="btn btn-primary">Play Again</button>
+                        <button id="close-game-over" class="btn btn-secondary">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/chess.js"></script>
+    <script src="js/game-state.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

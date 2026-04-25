@@ -1,0 +1,4 @@
+# Cloudflare Pages redirects configuration
+# All routes should serve index.html for SPA functionality
+
+/*    /index.html   200

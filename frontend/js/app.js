@@ -11,19 +11,37 @@ class ChessApp {
         this.currentGameId = null;
         this.userSettings = null;
 
-        this.init();
+        // Initialize without awaiting (constructor can't be async)
+        this.init().catch(error => {
+            console.error('Failed to initialize app:', error);
+        });
     }
 
     /**
      * Initialize the application
      */
     async init() {
+        console.log('🎮 Chess App Initializing...');
+
         // Initialize modules
         this.chessBoard = new ChessBoard('chess-board');
         this.gameState = new GameStateManager();
 
+        console.log('✅ Board and GameState created');
+        console.log('✅ ChessBoard container:', document.getElementById('chess-board'));
+
         // Set up board click handler
-        this.chessBoard.setOnSquareClick((from, to) => this.handleSquareClick(from, to));
+        this.chessBoard.setOnSquareClick((from, to) => {
+            console.log('🖱️ Click handler called with:', { from, to });
+            return this.handleSquareClick(from, to);
+        });
+
+        console.log('✅ Click handler registered');
+
+        // Add global click listener to debug
+        document.addEventListener('click', (e) => {
+            console.log('🌍 GLOBAL CLICK:', e.target.className, e.target.tagName);
+        }, true);
 
         // Set up game state handlers
         this.gameState.setOnTimerUpdate((time) => this.updateTimerDisplay(time));
@@ -41,6 +59,8 @@ class ChessApp {
 
         // Load user settings
         await this.loadSettings();
+
+        console.log('✅ App initialization complete');
     }
 
     /**
@@ -66,6 +86,30 @@ class ChessApp {
         // Logout button
         document.getElementById('logout-btn').addEventListener('click', () => {
             this.handleLogout();
+        });
+
+        // Test button
+        document.getElementById('test-btn').addEventListener('click', () => {
+            console.log('🧪 Test button clicked!');
+            console.log('🎮 Current game ID:', this.currentGameId);
+            console.log('♟️ ChessBoard instance:', this.chessBoard);
+            console.log('📊 GameState:', this.gameState);
+            console.log('🌐 API instance:', this.api);
+
+            const board = document.getElementById('chess-board');
+            console.log('🎯 Board element:', board);
+            console.log('🔢 Board children:', board ? board.children.length : 'N/A');
+
+            if (board && board.children.length > 0) {
+                console.log('✅ Board has', board.children.length, 'squares');
+                const firstSquare = board.children[0];
+                console.log('📦 First square:', firstSquare);
+                console.log('🎨 First square classes:', firstSquare.className);
+            } else {
+                console.log('❌ Board is empty or not found!');
+            }
+
+            alert('Check console for debug info! 🧪');
         });
 
         // Settings modal
@@ -307,12 +351,34 @@ class ChessApp {
             this.currentGameId = gameData.game.id;
             this.gameState.initializeGame(gameData);
 
-            this.updateGameDisplay();
+            console.log('Game started successfully:', gameData);
+            console.log('Game ID:', this.currentGameId);
+
+            await this.updateGameDisplay();
             this.hideModal('game-over-modal');
         } catch (error) {
             alert('Failed to start game: ' + error.message);
         } finally {
             this.hideLoading();
+            console.log('🔍 Checking for elements blocking the board...');
+
+            // Check what's on top of the board
+            const board = document.getElementById('chess-board');
+            if (board) {
+                const rect = board.getBoundingClientRect();
+                console.log('Board position:', rect);
+
+                // Check elements at board position
+                const topElement = document.elementFromPoint(rect.left + 50, rect.top + 50);
+                console.log('Element at board position:', topElement);
+                console.log('Element classes:', topElement?.className);
+            }
+
+            // Check if loading is visible
+            const loading = document.getElementById('loading');
+            console.log('Loading element:', loading);
+            console.log('Loading classes:', loading?.className);
+            console.log('Loading display:', window.getComputedStyle(loading)?.display);
         }
     }
 
@@ -320,22 +386,42 @@ class ChessApp {
      * Handle square click
      */
     async handleSquareClick(from, to) {
+        console.log('📱 App handleSquareClick called with:', { from, to });
+        console.log('🎮 Current game ID:', this.currentGameId);
+        console.log('🙂 Is player turn?', this.gameState.isPlayerTurn());
+
         if (!this.gameState.isPlayerTurn()) {
+            console.log('❌ Not player turn, ignoring');
             return; // Not player's turn
         }
 
         if (to) {
             // Make a move
-            await this.makeMove(from, to);
+            console.log('🚀 Making move from', from, 'to', to);
+            alert(`MOVING ${from} to ${to}!`);
+            console.log('📞 Calling makeMove...');
+
+            try {
+                await this.makeMove(from, to);
+                console.log('✅ Move completed successfully');
+            } catch (error) {
+                console.error('❌ Move failed:', error);
+            }
         } else {
             // Select square and show valid moves
+            console.log('🔍 Getting valid moves for square:', from);
+
             const gameData = await this.api.getGame(this.currentGameId);
             const validMoves = gameData.board.valid_moves || [];
 
+            console.log('📋 All valid moves from API:', validMoves);
+
             const myValidMoves = validMoves.filter(move => move.from === from);
+            console.log('♟️ Valid moves for this square:', myValidMoves);
 
             this.chessBoard.selectSquare(from);
             this.chessBoard.highlightMoves(myValidMoves);
+            console.log('✅ Square selected and moves highlighted');
         }
     }
 
@@ -362,15 +448,18 @@ class ChessApp {
     /**
      * Update game display
      */
-    updateGameDisplay() {
-        const state = this.gameState.getState();
+    async updateGameDisplay() {
+        console.log('🎨 Updating game display...');
 
-        // Update board
+        // Get fresh game data from API
         const gameData = await this.api.getGame(this.currentGameId);
         const validMoves = this.gameState.isPlayerTurn() ? (gameData.board.valid_moves || []) : [];
 
+        console.log('📋 Game data:', gameData);
+        console.log('♟️ Valid moves:', validMoves);
+
         this.chessBoard.render(
-            state.board.fen,
+            gameData.board.fen,
             validMoves,
             this.getLastMove(),
             this.getCheckSquare()
@@ -391,6 +480,8 @@ class ChessApp {
 
         // Update move history
         this.updateMoveHistory();
+
+        console.log('✅ Game display updated');
     }
 
     /**

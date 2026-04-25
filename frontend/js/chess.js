@@ -71,6 +71,8 @@ class ChessBoard {
     createBoard() {
         const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
+        console.log('Creating board with FEN:', this.boardState);
+
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const square = document.createElement('div');
@@ -80,6 +82,21 @@ class ChessBoard {
                 square.className = `square ${isLight ? 'light' : 'dark'}`;
                 square.dataset.square = squareName;
 
+                // Add click handler FIRST (before adding children)
+                square.addEventListener('click', (e) => {
+                    console.log('🎯 SQUARE CLICK HANDLER:', squareName);
+                    console.log('🖱️ Event target:', e.target.className);
+                    console.log('🎯 Current target:', e.currentTarget.className);
+                    this.handleSquareClick(squareName);
+                });
+
+                // Add simple click test
+                square.addEventListener('click', (e) => {
+                    console.log('🎯 Direct click on square:', squareName);
+                    console.log('🖱️ Event target:', e.target);
+                    console.log('🎯 Current target:', e.currentTarget);
+                });
+
                 // Add piece if present
                 const piece = this.boardState[row][col];
                 if (piece) {
@@ -87,6 +104,7 @@ class ChessBoard {
                     pieceSpan.className = 'piece';
                     pieceSpan.textContent = ChessBoard.PIECES[piece] || piece;
                     square.appendChild(pieceSpan);
+                    console.log(`Added piece ${piece} at ${squareName}`);
                 }
 
                 // Highlight selected square
@@ -131,31 +149,59 @@ class ChessBoard {
                     square.appendChild(file);
                 }
 
-                // Add click handler
-                square.addEventListener('click', () => this.handleSquareClick(squareName));
-
                 this.container.appendChild(square);
             }
         }
+
+        console.log('Board created with', this.container.children.length, 'squares');
     }
 
     /**
      * Handle square click
      */
     handleSquareClick(squareName) {
-        if (!this.onSquareClick) return;
+        console.log('🎯 handleSquareClick START:', squareName);
 
-        // If clicking on a valid move, execute it
-        const isValidMove = this.validMoves.some(move => move.to === squareName);
-        if (isValidMove && this.selectedSquare) {
-            this.onSquareClick(this.selectedSquare, squareName);
-            this.selectedSquare = null;
+        if (!this.onSquareClick) {
+            console.log('❌ No onSquareClick handler!');
             return;
         }
 
+        console.log('🖱️ Square clicked:', squareName);
+        console.log('📋 Valid moves:', this.validMoves);
+        console.log('🎯 Selected square:', this.selectedSquare);
+
+        // If clicking on a valid move, execute it
+        const isValidMove = this.validMoves.some(move => move.to === squareName);
+        console.log('✅ Is valid move destination?', isValidMove);
+
+        if (isValidMove && this.selectedSquare) {
+            console.log('🚀 EXECUTING MOVE:', this.selectedSquare, '->', squareName);
+            console.log('📞 Calling onSquareClick with:', this.selectedSquare, squareName);
+
+            try {
+                // Make the move
+                this.onSquareClick(this.selectedSquare, squareName);
+                this.selectedSquare = null;
+                console.log('✅ Move executed successfully');
+                return;
+            } catch (error) {
+                console.error('❌ Error executing move:', error);
+                console.error('❌ Error stack:', error.stack);
+            }
+        }
+
         // Select the square
+        console.log('🔵 Selecting square:', squareName);
         this.selectedSquare = squareName;
-        this.onSquareClick(squareName);
+
+        try {
+            this.onSquareClick(squareName);
+            console.log('✅ Square selected successfully');
+        } catch (error) {
+            console.error('❌ Error selecting square:', error);
+            console.error('❌ Error stack:', error.stack);
+        }
     }
 
     /**

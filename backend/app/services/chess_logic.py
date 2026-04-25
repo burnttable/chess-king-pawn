@@ -14,7 +14,9 @@ class ChessBoard:
     EMPTY = None
 
     # Initial FEN for king & pawn variant
-    INITIAL_FEN = 'k7/8/8/8/8/8/PPPPPPPP/4K3 w - - 0 1'
+    # White: King on e1, Pawns on a2-h2
+    # Black: King on e8, Pawns on a7-h7
+    INITIAL_FEN = '4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1'
 
     def __init__(self, fen=None):
         """Initialize board from FEN notation"""

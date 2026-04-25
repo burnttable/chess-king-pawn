@@ -171,6 +171,7 @@ body {
     background-color: var(--valid-move-indicator);
     border-radius: 50%;
     opacity: 0.6;
+    pointer-events: none;
 }
 
 .square.valid-capture {
@@ -413,6 +414,14 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 2000;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.loading:not(.hidden) {
+    pointer-events: all;
+    opacity: 1;
+}
 }
 
 .spinner {

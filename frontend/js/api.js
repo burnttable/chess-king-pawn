@@ -207,3 +207,6 @@ class ChessAPI {
 
 // Create global API instance
 const api = new ChessAPI();
+
+// Make it available globally
+window.api = api;
